@@ -14,9 +14,6 @@ def extract(salt, ikm):
 def expand(prk, info):
     return hmacsha256(prk, info + bytes([1]))
 
-def prf(k, name):
-    return k.expand(name.encode('utf8'))
-
 # The canonical encoding of the randomness.
 ikm = sys.argv[1].encode('utf8')
 # This is the one-time code.
