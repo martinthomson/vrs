@@ -70,7 +70,7 @@ unexpected reasons.
 
 The process for random selection is as follows:
 
-1. Agree to use this process.  If this fails, abort.
+1. Agree to use this process.
 
 2. Appoint a facilitator, who will execute the process.
 
@@ -114,11 +114,11 @@ that case, the complete set of selections is produced, applying any constraints
 as above.  After all selections are made, any unexpectedly unavailable options
 are publicly noted as disqualified from selection and the process is iterated.
 
-To select replacements for unexpectedly unavailable options, the process is
+To select substitutes for unexpectedly unavailable options, the process is
 iterated from the key generation stage (Step 5 above), using the next one-time
 code; see {{otp}}.  Using a one-time code avoids having to wait for new
 randomness to become available, but might give the facilitator some influence
-over the outcome; {{replacement}} explains in more detail.  Alternatively, the
+over the outcome; {{substitution}} explains in more detail.  Alternatively, the
 entire process can be repeated.
 
 
@@ -170,7 +170,7 @@ of the lotteries are run.
 
 ## One-Time Codes {#otp}
 
-A one-time code provides a facilitator with the ability to generate replacement
+A one-time code provides a facilitator with the ability to generate substitute
 selections in case of unexpected unavailability of one or more options.
 
 The facilitator selects a secret sequence of bytes.  This could be a string that
@@ -186,8 +186,8 @@ H(H(secret))` is hashing twice.  `H^n = H(H^{n-1}(secret))` is hashing `n`
 times.
 
 How many times the secret is hashed depends on the facilitators judgment of the
-need to find replacements.  Hashing many more times than is expected to be
-necessary will ensure that replacements can be produced immediately.
+need to find substitutes.  Hashing many more times than is expected to be
+necessary will ensure that substitutes can be produced immediately.
 
 The facilitator publishes `H^n(secret)` and `n` prior to any randomness being
 available.
@@ -288,7 +288,7 @@ An appeals process or similar can help safeguard against a facilitator that
 might be untrustworthy.
 
 
-## Facilitators and Selecting Replacements {#replacement}
+## Facilitators and Selecting Substitutes {#substitution}
 
 A facilitator has a limited ability to influence the selection process. This
 influence depends on the facilitator being able to cause a selected option to
@@ -296,10 +296,10 @@ become disqualified somehow.
 
 For example, if the process selects from volunteers for a task, the facilitator
 might need to check that selected volunteers are available to perform that task.
-A facilitator will know who will be selected as a replacement, if that becomes
-necessary.  If the facilitator prefers that a replacement is selected, they
-could attempt to force the use of a replacement, such as by not investing enough
-effort in confirming availability.
+A facilitator will know who will be selected as a substitute, if that becomes
+necessary.  If the facilitator prefers that a substitute is selected, they could
+attempt to force the use of a substitute, such as by not investing enough effort
+in confirming availability.
 
 This process is not robust against this attack; it depends on some amount of
 trust in the facilitator.  If concerns exist about the impartiality of the
@@ -315,7 +315,7 @@ The facilitator needs to keep the value they choose for generating one-time
 codes a secret until the process completes and all selections are made.
 
 An attacker that obtains this secret -- or any unused one-time code -- gains the
-foreknowledge available to the facilitator described in {{replacement}}.
+foreknowledge available to the facilitator described in {{substitution}}.
 
 
 
@@ -405,7 +405,7 @@ with the hashes truncated for formatting reasons):
 As blue was disqualified by prior agreement, the allocation was: walls
 "lavenderblush", doors "darkgoldenrod", and trim "mediumvioletred".  However, upon an
 attempt to acquire the "lavenderblush" paint, the supplier was unable to source
-enough to cover the needed area; a replacement was needed.
+enough to cover the needed area; a substitute was needed.
 
 The facilitator revealed the output of the 8th hash iteration
 (2f70f884997ce80771adbefbbbc6c71a1b921da71896c25ca0f64966bfd0c8ce), producing:
@@ -429,25 +429,29 @@ that was a consquence of strident complaints from the neighbors.
 
 # RFC 3797
 
-This document describes what is an alternative process to that described in RFC
-3797 {{?RFC3797}}.  It makes no effort to replace RFC 3797, however it is worth
+This document describes an alternative process to that described in RFC 3797
+{{?RFC3797}}.  It makes no effort to replace RFC 3797, however it is worth
 noting certain key differences.
 
-This process allows for more rapid replacement through the use of a one-time
+This process allows for more rapid substitution through the use of a one-time
 code.
 
 This process is marginally more robust against the inclusion of disqualified
 options.  The process in RFC 3797 critically depends on the number of options
-being known; see {{Section 5.1 of ?RFC3797}}, which recommends that invalid
-options remain in the list after the list is determined.  This is because RFC
-3797 selects from an ordered list by calculating an index from its PRF output,
-modulo the number of remaining options.
+being known. See {{Section 5.1 of ?RFC3797}} recommends that any option found to
+be invalid remains in the list once the list is fixed.  This is because RFC 3797
+selects from an ordered list by calculating an index from its PRF output, modulo
+the number of remaining options.
 
 In comparison, this process sorts the output of its PRF, with each output being
-dependent only on the randomness and the label.  For the process in this
-document, only labels need to be fixed prior to learning the randomness, not the
-composition of the entire list of options.
+dependent only on the public randomness, the one-time code, and the label for
+the option.  For the process in this document, only labels need to be fixed
+prior to learning the randomness, not the composition of the entire list of
+options.  This makes it possible to add or remove options without affecting the
+ordering of other options, if those changes can be justified.
 
+This process might be considered simpler than RFC 3797, even with the use of
+one-time codes for substitution.
 
 
 # Acknowledgments
