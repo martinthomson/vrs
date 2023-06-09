@@ -76,13 +76,14 @@ The process for random selection is as follows:
 
 3. The facilitator performs the following in any order:
 
-   a. Publish the list of options, along with labels for each option; see
+   1. Publish the list of options, along with labels for each option; see
       {{labels}} for details.
 
-   b. Choose and publish details for a source of randomness that will become
+   2. Choose and publish details for a source of randomness that will become
       available at some future time; see {{seeds}}.
 
-   c. Generate and publish a one-time code; see {{otp}}.
+   3. Generate and publish a one-time code; see {{otp}}.
+   {: type="a"}
 
 4. Wait for all randomness to become available.
 
