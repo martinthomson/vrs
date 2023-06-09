@@ -53,6 +53,22 @@ A process for performing random selection without bias is described.
 
 # Introduction
 
+On occasion, a group of people might agree that it is necessary to select from a
+set of options, but cannot agree on a selection.  In such cases, a random
+selection might be acceptable, but any potential for bias might not be.
+
+A process for selection in way that is verifiable and not subject to bias or
+influence by any party can be useful in such situations.  This document
+describes one such process.
+
+The IETF Nominating Committee {{?NOMCOM=RFC8713}} is an example of where a
+selection of ten people from a larger pool of eligible volunteers.  As the
+selected group is entrusted with considerable responsibility, there is a need to
+avoid any risk of bias in the outcome.
+
+This document describes a process that is an alternative to RFC 3797
+{{?RFC3797}}.
+
 
 # Process
 
@@ -60,13 +76,6 @@ A random selection process might be invoked to select a subset of one or more
 items from a longer list of options.  The purpose of this process is to select
 uniformly at random with minimal risk that the selection is influenced by
 anyone, including those responsible for executing the process.
-
-This process does not describe how the list of options is assembled, only how a
-random selection is made.
-
-The process allows for there to be additional constraints on selection, as well
-as providing process in case a selected option needs to be removed for
-unexpected reasons.
 
 The process for random selection is as follows:
 
@@ -103,23 +112,30 @@ Options are selected by taking from the sorted list in order, starting from the
 value with the lowest lexical value.
 
 There might be constraints on selection, such as requirements on diversity
-within the final set or disqualifications.  If any option cannot be selected,
-skip that option and select the next option from the list.  Options can only be
-skipped as a result of known constraints on selection, disqualifications (as
-below), and any factor that is not potentially subject to external influence.
+within the final selection, or disqualifications of individual options (see
+below).  If any option cannot be selected, skip that option and select the next
+option from the list.  Options can only be skipped as a result of known
+constraints on selection, disqualifications, and any factor that is not
+potentially subject to external influence.
 
-Options might be disqualified for reasons that are unexpected or could be
-subject to external influence, such as a volunteer becoming unavailable.  In
-that case, the complete set of selections is produced, applying any constraints
-as above.  After all selections are made, any unexpectedly unavailable options
-are publicly noted as disqualified from selection and the process is iterated.
+An options might become unavailable after selection for reasons that are
+unexpected or could be subject to external influence.  For instance, when
+selecting volunteers, a selected person could become unavailable through illess
+or other change of circumstance.  In that case, the complete set of selections
+is produced, applying any constraints as above.  After all selections are made,
+any options that have become unavailable are publicly noted as disqualified from
+selection and the process is iterated.
 
-To select substitutes for unexpectedly unavailable options, the process is
-iterated from the key generation stage (Step 5 above), using the next one-time
-code; see {{otp}}.  Using a one-time code avoids having to wait for new
-randomness to become available, but might give the facilitator some influence
-over the outcome; {{substitution}} explains in more detail.  Alternatively, the
-entire process can be repeated.
+Subsequent iterations start at the key generation stage (Step 5 above), using
+the next one-time code; see {{otp}}.  Using a one-time code avoids having to
+wait for new randomness to become available, but might give the facilitator some
+influence over the outcome.  Alternatively, the entire process can be
+repeated. {{substitution}} explores the consequences of this choice in more
+detail.
+
+This process does not describe how the list of options is assembled, or how
+constraints on selection are agreed.  This document only describes how a random
+selection is made.
 
 
 ## Labels {#labels}
@@ -127,16 +143,17 @@ entire process can be repeated.
 Options require labels.  This process requires that each option be given a
 unique and unambiguous label that is a sequence of bytes.
 
-Labels could be anything, but using UTF-8 encoded strings {{?UTF8=RFC3269}}
-without leading or trailing whitespace is ideal.  Such strings can be presented
-in a text file or in the body of email announcements.
+Labels could be anything, but using UTF-8 encoded Unicode strings
+{{?UTF8=RFC3629}} without leading or trailing whitespace can be most amenable to
+use in many contexts as they can represent many concepts clearly and in an
+accessible fashion.
 
 It should be clear what option each label corresponds to.  Names are often
 excellent labels.  Any options have the same name can have extra text added to
 disambiguate them.
 
-The use of Unicode allows the possibility that some strings appear to be equal
-when rendered, despite having very different character sequences.  Such
+The use of Unicode strings allows the possibility that some strings appear to be
+equal when rendered, despite having very different character sequences.  Such
 differences are significant; a single choice of encodingneeds to be made for
 each label prior to the release of randomness.
 
