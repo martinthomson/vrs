@@ -19,8 +19,8 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "A Verifiable Random Selection Process"
+abbrev: "Verifiable Random Selection"
 category: info
 
 docname: draft-todo-yourname-protocol-latest
@@ -33,8 +33,7 @@ area: AREA
 workgroup: WG Working Group
 keyword:
  - next generation
- - unicorn
- - sparkling distributed ledger
+ - crypto
 venue:
   group: WG
   type: Working Group
@@ -45,9 +44,9 @@ venue:
 
 author:
  -
-    fullname: Your Name Here
-    organization: Your Organization Here
-    email: your.email@example.com
+    fullname: Martin Thomson
+    organization: Mozilla
+    email: mt@lowentropy.net
 
 normative:
 
