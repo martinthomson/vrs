@@ -425,7 +425,8 @@ attempt to acquire the "lavenderblush" paint, the supplier was unable to source
 enough to cover the needed area; a substitute was needed.
 
 The facilitator revealed the output of the 8th hash iteration
-(2f70f884997ce80771adbefbbbc6c71a1b921da71896c25ca0f64966bfd0c8ce), producing:
+(2f70f884997ce80771adbefbbbc6c71a1b921da71896c25ca0f64966bfd0c8ce), producing a
+new list of selections as follows:
 
 ~~~
 00d1c59a9f1b581060a9e732e91... aqua
