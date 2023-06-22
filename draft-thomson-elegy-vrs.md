@@ -62,9 +62,9 @@ influence by any party can be useful in such situations.  This document
 describes one such process.
 
 The IETF Nominating Committee {{?NOMCOM=RFC8713}} is an example of where a
-selection of ten people from a larger pool of eligible volunteers.  As the
-selected group is entrusted with considerable responsibility, there is a need to
-avoid any risk of bias in the outcome.
+random selection is necessary.  Ten people are drawn from a larger pool of
+eligible volunteers.  As the selected group is entrusted with considerable
+responsibility, there is a need to avoid any risk of bias in the outcome.
 
 This document describes a process that is an alternative to RFC 3797
 {{?RFC3797}}.
@@ -234,7 +234,7 @@ SHA-256 is used to extract entropy and produce a pseudorandom key (or PRK).  The
 or `IKM` is set to the bytes from the randomness sources.
 
 ~~~ pseudocode
-PRF = HKDF-Extract(salt=one-time-code, IKM=randomness)
+PRK = HKDF-Extract(salt=one-time-code, IKM=randomness)
 ~~~
 
 This produces a `PRK` value.
@@ -248,10 +248,11 @@ is taken from the previous step ({{extract}}); the label for each option is used
 as the `info` input; and, the output length, `L`, is 32 (measured in bytes).
 
 ~~~ pseudocode
-order = HKDF-Expand(PRK, info=label, L=32)
+position = HKDF-Expand(PRK, info=label, L=32)
 ~~~
 
-This produces a value, `order`, that can be sorted.
+This produces a value, `position`, that can be sorted to produce a final
+ordering.
 
 
 ## Announcements and Timing
