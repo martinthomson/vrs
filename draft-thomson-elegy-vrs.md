@@ -118,10 +118,10 @@ option from the list.  Options can only be skipped as a result of known
 constraints on selection, disqualifications, and any factor that is not
 potentially subject to external influence.
 
-An options might become unavailable after selection for reasons that are
+An option might become unavailable after selection for reasons that are
 unexpected or could be subject to external influence.  For instance, when
-selecting volunteers, a selected person could become unavailable through illess
-or other change of circumstance.  In that case, the complete set of selections
+selecting volunteers, a selected person could become unavailable through illness
+or another change of circumstance.  In that case, the complete set of selections
 is produced, applying any constraints as above.  After all selections are made,
 any options that have become unavailable are publicly noted as disqualified from
 selection and the process is iterated.
@@ -149,12 +149,12 @@ use in many contexts as they can represent many concepts clearly and in an
 accessible fashion.
 
 It should be clear what option each label corresponds to.  Names are often
-excellent labels.  Any options have the same name can have extra text added to
+excellent labels.  Any options with the same name can have extra text added to
 disambiguate them.
 
 The use of Unicode strings allows the possibility that some strings appear to be
 equal when rendered, despite having very different character sequences.  Such
-differences are significant; a single choice of encodingneeds to be made for
+differences are significant; a single choice of encoding needs to be made for
 each label prior to the release of randomness.
 
 The facilitator announces the set of labels that will be used prior to
@@ -202,16 +202,16 @@ Concretely, if `H(secret)` is the process of hashing once, `H^2(secret) =
 H(H(secret))` is hashing twice.  `H^n = H(H^{n-1}(secret))` is hashing `n`
 times.
 
-How many times the secret is hashed depends on the facilitators judgment of the
+How many times the secret is hashed depends on the facilitator's judgment of the
 need to find substitutes.  Hashing many more times than is expected to be
 necessary will ensure that substitutes can be produced immediately.
 
 The facilitator publishes `H^n(secret)` and `n` prior to any randomness being
 available.
 
-Once randomness is available the first iteration of the selection process uses
+Once randomness is available, the first iteration of the selection process uses
 `H^{n-1}(secret)`, or the preimage of the original published value.  In the
-`i`-th iteration of the section process they use `H^{n-i}(secret)`, or the
+`i`-th iteration of the selection process, they use `H^{n-i}(secret)`, or the
 preimage of the last published value.  At each iteration of the process, the
 facilitator publishes the one-time code they use.
 
@@ -230,7 +230,7 @@ described in {{otp}}.
 
 The `HKDF-Extract` function ({{Section 2.2 of HKDF}}) with a hash function of
 SHA-256 is used to extract entropy and produce a pseudorandom key (or PRK).  The
-`salt` input is set to the butes of the one-time code, the input keying material
+`salt` input is set to the bytes of the one-time code, and the input keying material
 or `IKM` is set to the bytes from the randomness sources.
 
 ~~~ pseudocode
@@ -245,7 +245,7 @@ This produces a `PRK` value.
 The `HKDF-Extract` function ({{Section 2.3 of HKDF}}) with a hash function of
 SHA-256 is used as a pseudorandom function.  The pseudorandom key input, `PRF`,
 is taken from the previous step ({{extract}}); the label for each option is used
-as the `info` input; and, the output length, `L`, is 32 (measured in bytes).
+as the `info` input; and the output length, `L`, is 32 (measured in bytes).
 
 ~~~ pseudocode
 position = HKDF-Expand(PRK, info=label, L=32)
