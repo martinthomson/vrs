@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>A Verifiable Random Selection Process</title>
+<meta content="Martin Thomson" name="author">
+<meta content="
+       A process for performing random selection without bias is described. 
+    " name="description">
+<meta content="xml2rfc 3.17.3" name="generator">
+<meta content="next generation" name="keyword">
+<meta content="crypto" name="keyword">
+<meta content="draft-thomson-elegy-vrs-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.17.3
+    Python 3.11.4
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 3.1.0
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.2
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.31.0
+    setuptools 67.7.2
+    six 1.16.0
+    wcwidth 0.2.6
+-->
+<link href="draft-thomson-elegy-vrs.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+  margin-right: 1ch;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 10ch;
+  margin-right: 1.5ch;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 12ch !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Verifiable Random Selection</td>
+<td class="right">June 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Thomson</td>
+<td class="center">Expires 24 December 2023</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">NomCom Eligibility Update</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-thomson-elegy-vrs-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-06-22" class="published">22 June 2023</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2023-12-24">24 December 2023</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">M. Thomson</div>
+<div class="org">Mozilla</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">A Verifiable Random Selection Process</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">A process for performing random selection without bias is described.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://martinthomson.github.io/vrs/draft-thomson-elegy-vrs.html">https://martinthomson.github.io/vrs/draft-thomson-elegy-vrs.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-thomson-elegy-vrs/">https://datatracker.ietf.org/doc/draft-thomson-elegy-vrs/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        NomCom Eligibility Update Working Group mailing list (<span><a href="mailto:eligibility-discuss@ietf.org">mailto:eligibility-discuss@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/eligibility-discuss/">https://mailarchive.ietf.org/arch/browse/eligibility-discuss/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/eligibility-discuss/">https://www.ietf.org/mailman/listinfo/eligibility-discuss/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/martinthomson/vrs">https://github.com/martinthomson/vrs</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 24 December 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2023 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-process" class="internal xref">Process</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-labels" class="internal xref">Labels</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-randomness" class="internal xref">Randomness</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-one-time-codes" class="internal xref">One-Time Codes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="auto internal xref">2.4</a>.  <a href="#name-entropy-extraction" class="internal xref">Entropy Extraction</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="auto internal xref">2.5</a>.  <a href="#name-pseudorandom-function" class="internal xref">Pseudorandom Function</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.6">
+                <p id="section-toc.1-1.2.2.6.1"><a href="#section-2.6" class="auto internal xref">2.6</a>.  <a href="#name-announcements-and-timing" class="internal xref">Announcements and Timing</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.7">
+                <p id="section-toc.1-1.2.2.7.1"><a href="#section-2.7" class="auto internal xref">2.7</a>.  <a href="#name-encoding-and-sorting" class="internal xref">Encoding and Sorting</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.8">
+                <p id="section-toc.1-1.2.2.8.1"><a href="#section-2.8" class="auto internal xref">2.8</a>.  <a href="#name-hash-function-choice" class="internal xref">Hash Function Choice</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-facilitators-and-selecting-" class="internal xref">Facilitators and Selecting Substitutes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-secrecy-for-one-time-codes" class="internal xref">Secrecy for One-Time Codes</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-sample-code" class="internal xref">Sample Code</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-selection" class="internal xref">Selection</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-one-time-codes-2" class="internal xref">One-Time Codes</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-example-usage" class="internal xref">Example Usage</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-C" class="auto internal xref">Appendix C</a>.  <a href="#name-rfc-3797" class="internal xref">RFC 3797</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-E" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">On occasion, a group of people might agree that it is necessary to select from a
+set of options, but cannot agree on a selection.  In such cases, a random
+selection might be acceptable, but any potential for bias might not be.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">A process for selection in way that is verifiable and not subject to bias or
+influence by any party can be useful in such situations.  This document
+describes one such process.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">The IETF Nominating Committee <span>[<a href="#NOMCOM" class="cite xref">NOMCOM</a>]</span> is an example of where a
+random selection is necessary.  Ten people are drawn from a larger pool of
+eligible volunteers.  As the selected group is entrusted with considerable
+responsibility, there is a need to avoid any risk of bias in the outcome.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document describes a process that is an alternative to RFC 3797
+<span>[<a href="#RFC3797" class="cite xref">RFC3797</a>]</span>.<a href="#section-1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="process">
+<section id="section-2">
+      <h2 id="name-process">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-process" class="section-name selfRef">Process</a>
+      </h2>
+<p id="section-2-1">A random selection process might be invoked to select a subset of one or more
+items from a longer list of options.  The purpose of this process is to select
+uniformly at random with minimal risk that the selection is influenced by
+anyone, including those responsible for executing the process.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">The process for random selection is as follows:<a href="#section-2-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-2-3">
+<li id="section-2-3.1">Agree to use this process.<a href="#section-2-3.1" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.2">Appoint a facilitator, who will execute the process.<a href="#section-2-3.2" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.3">
+          <p id="section-2-3.3.1">The facilitator performs the following in any order:<a href="#section-2-3.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="a" class="normal type-a" id="section-2-3.3.2">
+<li id="section-2-3.3.2.1">Publish the list of options, along with labels for each option; see
+<a href="#labels" class="auto internal xref">Section 2.1</a> for details.<a href="#section-2-3.3.2.1" class="pilcrow">¶</a>
+</li>
+            <li id="section-2-3.3.2.2">Choose and publish details for a source of randomness that will become
+available at some future time; see <a href="#seeds" class="auto internal xref">Section 2.2</a>.<a href="#section-2-3.3.2.2" class="pilcrow">¶</a>
+</li>
+            <li id="section-2-3.3.2.3">Generate and publish a one-time code; see <a href="#otp" class="auto internal xref">Section 2.3</a>.<a href="#section-2-3.3.2.3" class="pilcrow">¶</a>
+</li>
+          </ol>
+</li>
+        <li id="section-2-3.4">Wait for all randomness to become available.<a href="#section-2-3.4" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.5">Publish the next one-time code; see <a href="#otp" class="auto internal xref">Section 2.3</a>.<a href="#section-2-3.5" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.6">Generate a pseudorandom key by extracting randomness from the sources and the
+one-time code; see <a href="#extract" class="auto internal xref">Section 2.4</a>.<a href="#section-2-3.6" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.7">Run a pseudorandom function (PRF) using the generated key and taking each
+label as input; see <a href="#expand" class="auto internal xref">Section 2.5</a>.<a href="#section-2-3.7" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.8">Sort the output.<a href="#section-2-3.8" class="pilcrow">¶</a>
+</li>
+        <li id="section-2-3.9">Perform selection.<a href="#section-2-3.9" class="pilcrow">¶</a>
+</li>
+      </ol>
+<p id="section-2-4">Options are selected by taking from the sorted list in order, starting from the
+value with the lowest lexical value.<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5">There might be constraints on selection, such as requirements on diversity
+within the final selection, or disqualifications of individual options (see
+below).  If any option cannot be selected, skip that option and select the next
+option from the list.  Options can only be skipped as a result of known
+constraints on selection, disqualifications, and any factor that is not
+potentially subject to external influence.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<p id="section-2-6">An options might become unavailable after selection for reasons that are
+unexpected or could be subject to external influence.  For instance, when
+selecting volunteers, a selected person could become unavailable through illess
+or other change of circumstance.  In that case, the complete set of selections
+is produced, applying any constraints as above.  After all selections are made,
+any options that have become unavailable are publicly noted as disqualified from
+selection and the process is iterated.<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2-7">Subsequent iterations start at the key generation stage (Step 5 above), using
+the next one-time code; see <a href="#otp" class="auto internal xref">Section 2.3</a>.  Using a one-time code avoids having to
+wait for new randomness to become available, but might give the facilitator some
+influence over the outcome.  Alternatively, the entire process can be
+repeated. <a href="#substitution" class="auto internal xref">Section 3.1</a> explores the consequences of this choice in more
+detail.<a href="#section-2-7" class="pilcrow">¶</a></p>
+<p id="section-2-8">This process does not describe how the list of options is assembled, or how
+constraints on selection are agreed.  This document only describes how a random
+selection is made.<a href="#section-2-8" class="pilcrow">¶</a></p>
+<div id="labels">
+<section id="section-2.1">
+        <h3 id="name-labels">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-labels" class="section-name selfRef">Labels</a>
+        </h3>
+<p id="section-2.1-1">Options require labels.  This process requires that each option be given a
+unique and unambiguous label that is a sequence of bytes.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1-2">Labels could be anything, but using UTF-8 encoded Unicode strings
+<span>[<a href="#UTF8" class="cite xref">UTF8</a>]</span> without leading or trailing whitespace can be most amenable to
+use in many contexts as they can represent many concepts clearly and in an
+accessible fashion.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">It should be clear what option each label corresponds to.  Names are often
+excellent labels.  Any options have the same name can have extra text added to
+disambiguate them.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">The use of Unicode strings allows the possibility that some strings appear to be
+equal when rendered, despite having very different character sequences.  Such
+differences are significant; a single choice of encodingneeds to be made for
+each label prior to the release of randomness.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1-5">The facilitator announces the set of labels that will be used prior to
+any randomness being available.<a href="#section-2.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="seeds">
+<section id="section-2.2">
+        <h3 id="name-randomness">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-randomness" class="section-name selfRef">Randomness</a>
+        </h3>
+<p id="section-2.2-1">A source of randomness needs to be chosen.  This source needs to produce
+sufficient entropy both to ensure that all possible selection outcomes are
+equally likely (see <span><a href="https://rfc-editor.org/rfc/rfc3797#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC3797" class="cite xref">RFC3797</a>]</span>) and to make pre-computation of
+options infeasible (see <a href="#security" class="auto internal xref">Section 3</a>).<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+<p id="section-2.2-2">The randomness source might be assembled from multiple discrete sources.  Each
+source and the date at which the entropy will be sampled needs to be announced.<a href="#section-2.2-2" class="pilcrow">¶</a></p>
+<p id="section-2.2-3">A process for turning the randomness from each source into a single sequence of
+bytes needs to be specified clearly.  This too should be announced.  <span><a href="https://rfc-editor.org/rfc/rfc3797#section-4" class="relref">Section 4</a> of [<a href="#RFC3797" class="cite xref">RFC3797</a>]</span> describes a method for the combination and canonical encoding of
+multiple sources that each produce multiple integers.<a href="#section-2.2-3" class="pilcrow">¶</a></p>
+<p id="section-2.2-4">Public lotteries are a good source of entropy, often providing in excess of 20
+bits of entropy each.  Choosing three or four different lotteries likely
+provides sufficient entropy.<a href="#section-2.2-4" class="pilcrow">¶</a></p>
+<p id="section-2.2-5">The facilitator announces which lotteries are to be used, the date of the
+lottery, and the encoding process.  This announcement needs to occur before any
+of the lotteries are run.<a href="#section-2.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="otp">
+<section id="section-2.3">
+        <h3 id="name-one-time-codes">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-one-time-codes" class="section-name selfRef">One-Time Codes</a>
+        </h3>
+<p id="section-2.3-1">A one-time code provides a facilitator with the ability to generate substitute
+selections in case of unexpected unavailability of one or more options.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<p id="section-2.3-2">The facilitator selects a secret sequence of bytes.  This could be a string that
+is UTF-8 encoded as is done for labels.<a href="#section-2.3-2" class="pilcrow">¶</a></p>
+<p id="section-2.3-3">The facilitator then iteratively applies SHA-256
+<span>[<a href="#SHA2" class="cite xref">SHA2</a>]</span> to this sequence multiple times.  This
+generates a hash commitment.  <span>[<a href="#RFC1760" class="cite xref">RFC1760</a>]</span> describes this process for use in
+generating one-time passwords.<a href="#section-2.3-3" class="pilcrow">¶</a></p>
+<p id="section-2.3-4">Concretely, if <code>H(secret)</code> is the process of hashing once, <code>H^2(secret) =
+H(H(secret))</code> is hashing twice.  <code>H^n = H(H^{n-1}(secret))</code> is hashing <code>n</code>
+times.<a href="#section-2.3-4" class="pilcrow">¶</a></p>
+<p id="section-2.3-5">How many times the secret is hashed depends on the facilitators judgment of the
+need to find substitutes.  Hashing many more times than is expected to be
+necessary will ensure that substitutes can be produced immediately.<a href="#section-2.3-5" class="pilcrow">¶</a></p>
+<p id="section-2.3-6">The facilitator publishes <code>H^n(secret)</code> and <code>n</code> prior to any randomness being
+available.<a href="#section-2.3-6" class="pilcrow">¶</a></p>
+<p id="section-2.3-7">Once randomness is available the first iteration of the selection process uses
+<code>H^{n-1}(secret)</code>, or the preimage of the original published value.  In the
+<code>i</code>-th iteration of the section process they use <code>H^{n-i}(secret)</code>, or the
+preimage of the last published value.  At each iteration of the process, the
+facilitator publishes the one-time code they use.<a href="#section-2.3-7" class="pilcrow">¶</a></p>
+<p id="section-2.3-8">The chosen secret cannot be used.  If the process iterates enough times to reach
+that point, new randomness and a new one-time code will need to be generated.<a href="#section-2.3-8" class="pilcrow">¶</a></p>
+<p id="section-2.3-9">After the selection process is complete, the facilitator publishes their chosen
+secret.<a href="#section-2.3-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="extract">
+<section id="section-2.4">
+        <h3 id="name-entropy-extraction">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-entropy-extraction" class="section-name selfRef">Entropy Extraction</a>
+        </h3>
+<p id="section-2.4-1">Once randomness is available, the facilitator constructs a byte sequence from
+the randomness as described in <a href="#seeds" class="auto internal xref">Section 2.2</a>.  They also obtain the one-time code as
+described in <a href="#otp" class="auto internal xref">Section 2.3</a>.<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+<p id="section-2.4-2">The <code>HKDF-Extract</code> function (<span><a href="https://rfc-editor.org/rfc/rfc5869#section-2.2" class="relref">Section 2.2</a> of [<a href="#HKDF" class="cite xref">HKDF</a>]</span>) with a hash function of
+SHA-256 is used to extract entropy and produce a pseudorandom key (or PRK).  The
+<code>salt</code> input is set to the butes of the one-time code, the input keying material
+or <code>IKM</code> is set to the bytes from the randomness sources.<a href="#section-2.4-2" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-2.4-3">
+<pre>
+PRK = HKDF-Extract(salt=one-time-code, IKM=randomness)
+</pre><a href="#section-2.4-3" class="pilcrow">¶</a>
+</div>
+<p id="section-2.4-4">This produces a <code>PRK</code> value.<a href="#section-2.4-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="expand">
+<section id="section-2.5">
+        <h3 id="name-pseudorandom-function">
+<a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-pseudorandom-function" class="section-name selfRef">Pseudorandom Function</a>
+        </h3>
+<p id="section-2.5-1">The <code>HKDF-Extract</code> function (<span><a href="https://rfc-editor.org/rfc/rfc5869#section-2.3" class="relref">Section 2.3</a> of [<a href="#HKDF" class="cite xref">HKDF</a>]</span>) with a hash function of
+SHA-256 is used as a pseudorandom function.  The pseudorandom key input, <code>PRF</code>,
+is taken from the previous step (<a href="#extract" class="auto internal xref">Section 2.4</a>); the label for each option is used
+as the <code>info</code> input; and, the output length, <code>L</code>, is 32 (measured in bytes).<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-2.5-2">
+<pre>
+position = HKDF-Expand(PRK, info=label, L=32)
+</pre><a href="#section-2.5-2" class="pilcrow">¶</a>
+</div>
+<p id="section-2.5-3">This produces a value, <code>position</code>, that can be sorted to produce a final
+ordering.<a href="#section-2.5-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="announcements-and-timing">
+<section id="section-2.6">
+        <h3 id="name-announcements-and-timing">
+<a href="#section-2.6" class="section-number selfRef">2.6. </a><a href="#name-announcements-and-timing" class="section-name selfRef">Announcements and Timing</a>
+        </h3>
+<p id="section-2.6-1">A facilitator needs to communicate clearly throughout the process.<a href="#section-2.6-1" class="pilcrow">¶</a></p>
+<p id="section-2.6-2">Announcements regarding labels, randomness, and one-time codes -- including the
+encoding of each -- need to be made prior to any randomness becoming available.
+A single announcement for all of this information might be sufficient.<a href="#section-2.6-2" class="pilcrow">¶</a></p>
+<p id="section-2.6-3">Once randomness is available, a single announcement can include the revealed
+one-time code and the result of that iteration of selection.<a href="#section-2.6-3" class="pilcrow">¶</a></p>
+<p id="section-2.6-4">For all announcements, allowing some time for validation and questions is
+advisable.  If it takes time to confirm that an option is available for
+selection, the next iteration of the process cannot be started until that time
+passes.<a href="#section-2.6-4" class="pilcrow">¶</a></p>
+<p id="section-2.6-5">When publishing values, the facilitator can use hexadecimal encoding to produce
+text strings that might be easier to use.<a href="#section-2.6-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="encoding-and-sorting">
+<section id="section-2.7">
+        <h3 id="name-encoding-and-sorting">
+<a href="#section-2.7" class="section-number selfRef">2.7. </a><a href="#name-encoding-and-sorting" class="section-name selfRef">Encoding and Sorting</a>
+        </h3>
+<p id="section-2.7-1">For the sorting and selection process, using hexadecimal strings might also help
+simplify handling.  Hexadecimal strings sort identically to the underlying byte
+sequence.  If the hexadecimal strings are printed one to a line, with the input
+label (or name) after it on the same line, that can make it easier to identify
+options in the sorted output.<a href="#section-2.7-1" class="pilcrow">¶</a></p>
+<p id="section-2.7-2">The sample code in <a href="#code" class="auto internal xref">Appendix A</a> uses this method.  It does not sort its output, as
+that can be performed by a standard <code>sort</code> tool.<a href="#section-2.7-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="hash-function-choice">
+<section id="section-2.8">
+        <h3 id="name-hash-function-choice">
+<a href="#section-2.8" class="section-number selfRef">2.8. </a><a href="#name-hash-function-choice" class="section-name selfRef">Hash Function Choice</a>
+        </h3>
+<p id="section-2.8-1">This process uses SHA-256 as its hash function for both one-time codes (<a href="#otp" class="auto internal xref">Section 2.3</a>)
+and the KDF (Sections <a href="#extract" class="auto internal xref">2.4</a> and <a href="#expand" class="auto internal xref">2.5</a>).  A different hash function
+could be used, but then it would not be this process.<a href="#section-2.8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security">
+<section id="section-3">
+      <h2 id="name-security-considerations">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-3-1">Low entropy randomness in a selection process could allow an attacker to compute
+all possible outcomes.  Then, the attacker might be able to select options (or
+labels for options) that improve the odds of an outcome favorable to them.
+Given the use of one-time codes in this process, the only attacker who is in any
+position to take advantage of this is the facilitator.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">An appeals process or similar can help safeguard against a facilitator that
+might be untrustworthy.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<div id="substitution">
+<section id="section-3.1">
+        <h3 id="name-facilitators-and-selecting-">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-facilitators-and-selecting-" class="section-name selfRef">Facilitators and Selecting Substitutes</a>
+        </h3>
+<p id="section-3.1-1">A facilitator has a limited ability to influence the selection process. This
+influence depends on the facilitator being able to cause a selected option to
+become disqualified somehow.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">For example, if the process selects from volunteers for a task, the facilitator
+might need to check that selected volunteers are available to perform that task.
+A facilitator will know who will be selected as a substitute, if that becomes
+necessary.  If the facilitator prefers that a substitute is selected, they could
+attempt to force the use of a substitute, such as by not investing enough effort
+in confirming availability.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">This process is not robust against this attack; it depends on some amount of
+trust in the facilitator.  If concerns exist about the impartiality of the
+facilitator, the entire process can be re-run if an option becomes unavailable.
+However, this adds another period of waiting for fresh randomness, which could
+be too slow.  This is therefore a question of balancing a small dependency on
+the facilitator against expedience.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="secrecy-for-one-time-codes">
+<section id="section-3.2">
+        <h3 id="name-secrecy-for-one-time-codes">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-secrecy-for-one-time-codes" class="section-name selfRef">Secrecy for One-Time Codes</a>
+        </h3>
+<p id="section-3.2-1">The facilitator needs to keep the value they choose for generating one-time
+codes a secret until the process completes and all selections are made.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">An attacker that obtains this secret -- or any unused one-time code -- gains the
+foreknowledge available to the facilitator described in <a href="#substitution" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-4">
+      <h2 id="name-iana-considerations">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-4-1">This document has no IANA actions.<a href="#section-4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-5">
+      <h2 id="name-references">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-5.1">
+        <h3 id="name-normative-references">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="HKDF">[HKDF]</dt>
+        <dd>
+<span class="refAuthor">Krawczyk, H.</span> and <span class="refAuthor">P. Eronen</span>, <span class="refTitle">"HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"</span>, <span class="seriesInfo">RFC 5869</span>, <span class="seriesInfo">DOI 10.17487/RFC5869</span>, <time datetime="2010-05" class="refDate">May 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5869">https://www.rfc-editor.org/rfc/rfc5869</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SHA2">[SHA2]</dt>
+      <dd>
+<span class="refAuthor">Dang, Q.</span>, <span class="refTitle">"Secure Hash Standard"</span>, <span class="seriesInfo">National Institute of Standards and Technology report</span>, <span class="seriesInfo">DOI 10.6028/nist.fips.180-4</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://doi.org/10.6028/nist.fips.180-4">https://doi.org/10.6028/nist.fips.180-4</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-5.2">
+        <h3 id="name-informative-references">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="CSS3">[CSS3]</dt>
+        <dd>
+<span class="refAuthor">Çelik, T.</span>, <span class="refAuthor">Lilley, C.</span>, and <span class="refAuthor">L. D. Baron</span>, <span class="refTitle">"CSS Color Module Level 3"</span>, <span class="seriesInfo">W3C Recommendation</span>, <time datetime="2022-01-18" class="refDate">18 January 2022</time>, <span>&lt;<a href="https://www.w3.org/TR/2022/REC-css-color-3-20220118/">https://www.w3.org/TR/2022/REC-css-color-3-20220118/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="NOMCOM">[NOMCOM]</dt>
+        <dd>
+<span class="refAuthor">Kucherawy, M., Ed.</span>, <span class="refAuthor">Hinden, R., Ed.</span>, and <span class="refAuthor">J. Livingood, Ed.</span>, <span class="refTitle">"IAB, IESG, IETF Trust, and IETF LLC Selection, Confirmation, and Recall Process: Operation of the IETF Nominating and Recall Committees"</span>, <span class="seriesInfo">BCP 10</span>, <span class="seriesInfo">RFC 8713</span>, <span class="seriesInfo">DOI 10.17487/RFC8713</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8713">https://www.rfc-editor.org/rfc/rfc8713</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1760">[RFC1760]</dt>
+        <dd>
+<span class="refAuthor">Haller, N.</span>, <span class="refTitle">"The S/KEY One-Time Password System"</span>, <span class="seriesInfo">RFC 1760</span>, <span class="seriesInfo">DOI 10.17487/RFC1760</span>, <time datetime="1995-02" class="refDate">February 1995</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1760">https://www.rfc-editor.org/rfc/rfc1760</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3797">[RFC3797]</dt>
+        <dd>
+<span class="refAuthor">Eastlake 3rd, D.</span>, <span class="refTitle">"Publicly Verifiable Nominations Committee (NomCom) Random Selection"</span>, <span class="seriesInfo">RFC 3797</span>, <span class="seriesInfo">DOI 10.17487/RFC3797</span>, <time datetime="2004-06" class="refDate">June 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3797">https://www.rfc-editor.org/rfc/rfc3797</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="UTF8">[UTF8]</dt>
+      <dd>
+<span class="refAuthor">Yergeau, F.</span>, <span class="refTitle">"UTF-8, a transformation format of ISO 10646"</span>, <span class="seriesInfo">STD 63</span>, <span class="seriesInfo">RFC 3629</span>, <span class="seriesInfo">DOI 10.17487/RFC3629</span>, <time datetime="2003-11" class="refDate">November 2003</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3629">https://www.rfc-editor.org/rfc/rfc3629</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="code">
+<section id="appendix-A">
+      <h2 id="name-sample-code">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-sample-code" class="section-name selfRef">Sample Code</a>
+      </h2>
+<p id="appendix-A-1">This section includes simple python code for running this process.  Separate
+scripts exist for running selection (<a href="#code-selection" class="auto internal xref">Figure 1</a>) and managing one-time
+codes (<a href="#code-otp" class="auto internal xref">Figure 2</a>).<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<div id="selection">
+<section id="appendix-A.1">
+        <h3 id="name-selection">
+<a href="#appendix-A.1" class="section-number selfRef">A.1. </a><a href="#name-selection" class="section-name selfRef">Selection</a>
+        </h3>
+<p id="appendix-A.1-1">Values for the randomness and one-time code are provided as the first and second
+arguments to the python script in <a href="#code-selection" class="auto internal xref">Figure 1</a>, which implements steps 6
+and 7 of the process in <a href="#process" class="auto internal xref">Section 2</a>.<a href="#appendix-A.1-1" class="pilcrow">¶</a></p>
+<span id="name-implementation-of-pseudoran"></span><div id="code-selection">
+<figure id="figure-1">
+          <div class="lang-python sourcecode" id="appendix-A.1-2.1">
+<pre>
+#!/usr/bin/env python3
+import sys
+
+def hmacsha256(k, v):
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes, hmac
+    ctx = hmac.HMAC(k, hashes.SHA256(), backend=default_backend())
+    ctx.update(v)
+    return ctx.finalize()
+
+def extract(salt, ikm):
+    return hmacsha256(salt, ikm)
+
+def expand(prk, info):
+    return hmacsha256(prk, info + bytes([1]))
+
+# The canonical encoding of the randomness.
+ikm = sys.argv[1].encode('utf8')
+# This is the one-time code.
+salt = bytes.fromhex(sys.argv[2])
+prk = extract(salt, ikm)
+
+for line in sys.stdin:
+    label = line.strip()
+    order = expand(prk, label.encode('utf8'))
+    print(f"{order.hex()} {label}")
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-implementation-of-pseudoran" class="selfRef">Implementation of Pseudorandomness</a>
+          </figcaption></figure>
+</div>
+<p id="appendix-A.1-3">This script is intended to be used with a separate sorting tool as follows:<a href="#appendix-A.1-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.1-4">
+<pre>
+$ ./select.py "$randomness" "$otp" | sort
+</pre><a href="#appendix-A.1-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="one-time-codes">
+<section id="appendix-A.2">
+        <h3 id="name-one-time-codes-2">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-one-time-codes-2" class="section-name selfRef">One-Time Codes</a>
+        </h3>
+<p id="appendix-A.2-1">The script in <a href="#code-otp" class="auto internal xref">Figure 2</a> implements the generation of one-time codes from a
+secret.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<span id="name-implementation-of-the-one-t"></span><div id="code-otp">
+<figure id="figure-2">
+          <div class="lang-python sourcecode" id="appendix-A.2-2.1">
+<pre>
+#!/usr/bin/env python3
+import hashlib
+import sys
+
+count = 25
+input = bytes.fromhex(sys.argv[1])
+# Or, for a hard-coded ASCII string: input = b"secret"
+
+print(f" 0: {input.hex()}")
+x = hashlib.sha256(input)
+for i in range(1,count):
+    print(f"{i:&gt;2}: {x.hexdigest()}")
+    x = hashlib.sha256(x.digest())
+
+print(f"{count:&gt;2}: {x.hexdigest()}")
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-implementation-of-the-one-t" class="selfRef">Implementation of the One-Time Codes</a>
+          </figcaption></figure>
+</div>
+<p id="appendix-A.2-3">This script can also be used to verify the value revealed by the facilitator.
+The value revealed by the facilitator at each iteration of the process can be
+passed to this script, which should produce all previously revealed values.<a href="#appendix-A.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="example-usage">
+<section id="appendix-B">
+      <h2 id="name-example-usage">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-example-usage" class="section-name selfRef">Example Usage</a>
+      </h2>
+<p id="appendix-B-1">A committee is tasked with painting a building (which may or may not be a bike
+shed) and have concluded that three different colors are needed for walls,
+doors, and trim (eaves, gutters, and so forth).  They managed to agree that the
+blue or anything close to blue was undesirable, but could not otherwise
+agree. Ultimately the group agreed to follow a random selection process.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">The list of color names from CSS level 3 <span>[<a href="#CSS3" class="cite xref">CSS3</a>]</span> was agreed as the basis for
+selection, with "transparent", "grey", "cyan", and "magenta" being disqualifed
+on the basis of either being not a color or an alias of another name.  A list of
+those colors that were "blue" enough to be disqualified were agreed.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-3">The facilitator chose a secret phrase "totally not a bikeshed", encoded it in
+UTF-8, and published the output of 10 iterations of SHA-256 in hex:
+950ea08d8d5fd3ae415b9967aba7a48aba39ca62a4d98f2e7fe25cb1b8f8c488.<a href="#appendix-B-3" class="pilcrow">¶</a></p>
+<p id="appendix-B-4">The facilitator announced the exact process for public randomness, including the
+use of three different lotteries on a future date and how the results would be
+encoded, using the method from RFC 3797. After waiting, the lotteries finally
+ran to produce the unlikely string of "1.2.3.4.5.6./1.2.3.4.5.6./1.2.3.4.5.6./".<a href="#appendix-B-4" class="pilcrow">¶</a></p>
+<p id="appendix-B-5">The facilitator revealed the output of the 9th hash iteration
+(5346f2efb5397a6788fc1f1d9c05c6d3f2abe9b7d16d8592a3695b6dbe9f2456) and ran the
+selection process, producing the following (including only the first few lines,
+with the hashes truncated for formatting reasons):<a href="#appendix-B-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-B-6">
+<pre>
+002ed527ae0a44a86c205d1cdba... lavenderblush
+03f710be2b61a6f9c3f89aa5ab5... blue
+08bab81380d7f0769cecf9969a8... darkgoldenrod
+0c26494fa81f3aed8a9f66e77b7... mediumvioletred
+0e1af5d1ccfd44de075cc0bb6d5... bisque
+13a07cc9abf3b737e49a62b0634... lightpink
+</pre><a href="#appendix-B-6" class="pilcrow">¶</a>
+</div>
+<p id="appendix-B-7">As blue was disqualified by prior agreement, the allocation was: walls
+"lavenderblush", doors "darkgoldenrod", and trim "mediumvioletred".  However, upon an
+attempt to acquire the "lavenderblush" paint, the supplier was unable to source
+enough to cover the needed area; a substitute was needed.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
+<p id="appendix-B-8">The facilitator revealed the output of the 8th hash iteration
+(2f70f884997ce80771adbefbbbc6c71a1b921da71896c25ca0f64966bfd0c8ce), producing a
+new list of selections as follows:<a href="#appendix-B-8" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-B-9">
+<pre>
+00d1c59a9f1b581060a9e732e91... aqua
+02b514b0b1807bfe086db524f40... darkgray
+0337add95eac62a356b020a273a... cornflowerblue
+</pre><a href="#appendix-B-9" class="pilcrow">¶</a>
+</div>
+<p id="appendix-B-10">The first option of "aqua" was selected for use on the walls. Concerns were
+raised about "aqua" being basically blue and that it should have been
+disqualified instead of "cyan", but the outcome of the process was not in
+dispute as the qualified colors were very clearly specified as part of the
+agreed process and that process had been strictly adhered to.<a href="#appendix-B-10" class="pilcrow">¶</a></p>
+<p id="appendix-B-11">Only murmurs about the paint supplier's familial relationship with the
+facilitator would mean that the color scheme did not last long, though maybe
+that was a consquence of strident complaints from the neighbors.<a href="#appendix-B-11" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="rfc-3797">
+<section id="appendix-C">
+      <h2 id="name-rfc-3797">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-rfc-3797" class="section-name selfRef">RFC 3797</a>
+      </h2>
+<p id="appendix-C-1">This document describes an alternative process to that described in RFC 3797
+<span>[<a href="#RFC3797" class="cite xref">RFC3797</a>]</span>.  It makes no effort to replace RFC 3797, however it is worth
+noting certain key differences.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<p id="appendix-C-2">This process allows for more rapid substitution through the use of a one-time
+code.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
+<p id="appendix-C-3">This process is marginally more robust against the inclusion of disqualified
+options.  The process in RFC 3797 critically depends on the number of options
+being known. See <span><a href="https://rfc-editor.org/rfc/rfc3797#section-5.1" class="relref">Section 5.1</a> of [<a href="#RFC3797" class="cite xref">RFC3797</a>]</span> recommends that any option found to
+be invalid remains in the list once the list is fixed.  This is because RFC 3797
+selects from an ordered list by calculating an index from its PRF output, modulo
+the number of remaining options.<a href="#appendix-C-3" class="pilcrow">¶</a></p>
+<p id="appendix-C-4">In comparison, this process sorts the output of its PRF, with each output being
+dependent only on the public randomness, the one-time code, and the label for
+the option.  For the process in this document, only labels need to be fixed
+prior to learning the randomness, not the composition of the entire list of
+options.  This makes it possible to add or remove options without affecting the
+ordering of other options, if those changes can be justified.<a href="#appendix-C-4" class="pilcrow">¶</a></p>
+<p id="appendix-C-5">This process might be considered simpler than RFC 3797, even with the use of
+one-time codes for substitution.<a href="#appendix-C-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-D">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-D-1">The basic underlying idea here comes from <span class="contact-name">Paul Hoffman</span>.  <span>[<a href="#RFC3797" class="cite xref">RFC3797</a>]</span> and
+the one-time code idea are both the work of <span class="contact-name">Donald Eastlake</span>.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-E">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Martin Thomson</span></div>
+<div dir="auto" class="left"><span class="org">Mozilla</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:mt@lowentropy.net" class="email">mt@lowentropy.net</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
