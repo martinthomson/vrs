@@ -4,8 +4,8 @@
 
 NomCom Eligibility Update                                     M. Thomson
 Internet-Draft                                                   Mozilla
-Intended status: Informational                              17 July 2023
-Expires: 18 January 2024
+Intended status: Informational                         17 September 2023
+Expires: 20 March 2024
 
 
                  A Verifiable Random Selection Process
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 January 2024.
+   This Internet-Draft will expire on 20 March 2024.
 
 Copyright Notice
 
@@ -394,9 +394,8 @@ Table of Contents
               <https://www.rfc-editor.org/rfc/rfc5869>.
 
    [SHA2]     Dang, Q., "Secure Hash Standard", National Institute of
-              Standards and Technology report,
-              DOI 10.6028/nist.fips.180-4, July 2015,
-              <https://doi.org/10.6028/nist.fips.180-4>.
+              Standards and Technology, DOI 10.6028/nist.fips.180-4,
+              July 2015, <https://doi.org/10.6028/nist.fips.180-4>.
 
 5.2.  Informative References
 
